@@ -1,0 +1,5 @@
+#!/command/with-contenv bash
+
+echo "Starting php-fpm83"
+
+exec /usr/sbin/php-fpm83
