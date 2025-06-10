@@ -35,6 +35,7 @@ RUN \
     php83-dom \
     php83-exif \
     php83-ftp \
+    php83-fpm \
     php83-gd \
     php83-gmp \
     php83-imap \
@@ -65,31 +66,20 @@ RUN \
 
 RUN \
   echo "**** configure nginx ****" \
-  && echo 'fastcgi_param  HTTP_PROXY         ""; # https://httpoxy.org/' >> \
-    /etc/nginx/fastcgi_params \
-  && echo 'fastcgi_param  PATH_INFO          $fastcgi_path_info; # http://nginx.org/en/docs/http/ngx_http_fastcgi_module.html#fastcgi_split_path_info' >> \
-    /etc/nginx/fastcgi_params \
-  && echo 'fastcgi_param  SCRIPT_FILENAME    $document_root$fastcgi_script_name; # https://www.nginx.com/resources/wiki/start/topics/examples/phpfcgi/#connecting-nginx-to-php-fpm' >> \
-    /etc/nginx/fastcgi_params \
-  && echo 'fastcgi_param  SERVER_NAME        $host; # Send HTTP_HOST as SERVER_NAME. If HTTP_HOST is blank, send the value of server_name from nginx (default is `_`)' >> \
-    /etc/nginx/fastcgi_params \
   && rm -f /etc/nginx/conf.d/stream.conf \
   && rm -f /etc/nginx/http.d/default.conf \
+  && ln -sf /dev/stdout /var/log/nginx/access.log \
+  && ln -sf /dev/stderr /var/log/nginx/error.log \
+  && adduser -u 82 -D -S -G www-data www-data \
+  && mkdir -p /data/web \
   && echo "**** guarantee correct php version is symlinked ****"  \
-  && if [ "$(readlink /usr/bin/php)" != "php84" ]; then \
+  && if [ "$(readlink /usr/bin/php)" != "php83" ]; then \
     rm -rf /usr/bin/php  && \
     ln -s /usr/bin/php83 /usr/bin/php; \
   fi 
 
 RUN \
-  echo "**** configure php ****"  \
-  && sed -i "s#;error_log = log/php83/error.log.*#error_log = /config/log/php/error.log#g" \
-    /etc/php83/php-fpm.conf  \
-  && sed -i "s#user = nobody.*#user = abc#g" \
-    /etc/php83/php-fpm.d/www.conf  \
-  && sed -i "s#group = nobody.*#group = abc#g" \
-    /etc/php83/php-fpm.d/www.conf  \
-  && echo "**** add run paths to php runtime config ****" \
+  echo "**** add run paths to php runtime config ****" \
   && grep -qxF 'include=/config/php/*.conf' /etc/php83/php-fpm.conf || echo 'include=/config/php/*.conf' >> /etc/php83/php-fpm.conf  \
   && echo "**** install php composer ****" && \
   EXPECTED_CHECKSUM="$(php -r 'copy("https://composer.github.io/installer.sig", "php://stdout");')" && \
