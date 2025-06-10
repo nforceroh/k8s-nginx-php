@@ -98,7 +98,7 @@ ADD --chmod=755 /content/etc/s6-overlay /etc/s6-overlay
 
 
 # ports and volumes
-EXPOSE 80 443
+EXPOSE 8080
 
 VOLUME /config
 
