@@ -2,9 +2,7 @@ FROM ghcr.io/nforceroh/k8s-alpine-baseimage:3.23
 
 ARG \
   BUILD_DATE=now \
-  VERSION=unknown \
-  S6_OVERLAY_VERSION="3.2.2.0" \
-  S6_OVERLAY_ARCH="x86_64"
+  VERSION=unknown 
 
 LABEL \
   org.label-schema.maintainer="Sylvain Martin (sylvain@nforcer.com)" \
