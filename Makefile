@@ -4,7 +4,7 @@ SHELL := /bin/bash
 IMG_NAME := alpine-nginx
 IMG_REPO := nforceroh
 DOCKERCMD := docker
-VERSION := php83
+VERSION := php85
 
 #oc get route default-route -n openshift-image-registry
 #podman login -u sylvain -p $(oc whoami -t) default-route-openshift-image-registry.apps.ocp.nf.lab

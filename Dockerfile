@@ -1,11 +1,18 @@
-FROM ghcr.io/nforceroh/k8s-alpine-baseimage:latest
+FROM ghcr.io/nforceroh/k8s-alpine-baseimage:3.23
 
 ARG \
   BUILD_DATE=now \
-  VERSION=unknown
+  VERSION=unknown \
+  S6_OVERLAY_VERSION="3.2.2.0" \
+  S6_OVERLAY_ARCH="x86_64"
 
 LABEL \
-  maintainer="Sylvain Martin (sylvain@nforcer.com)"
+  org.label-schema.maintainer="Sylvain Martin (sylvain@nforcer.com)" \
+  org.label-schema.build-date="${BUILD_DATE}" \
+  org.label-schema.version="${VERSION}" \
+  org.label-schema.vcs-url="https://github.com/nforcer/k8s-nginx-php" \
+  org.label-schema.vcs-ref="${VERSION}" \
+  org.label-schema.schema-version="1.0"
 
 RUN \
   apk add --no-cache \
@@ -30,39 +37,37 @@ RUN \
     nginx-mod-stream-geoip \
     nginx-mod-stream-geoip2 \
     nginx-vim \
-    php83-bcmath \
-    php83-bz2 \
-    php83-dom \
-    php83-exif \
-    php83-ftp \
-    php83-fpm \
-    php83-gd \
-    php83-gmp \
-    php83-imap \
-    php83-intl \
-    php83-ldap \
-    php83-mysqli \
-    php83-mysqlnd \
-    php83-opcache \
-    php83-pdo_mysql \
-    php83-pdo_odbc \
-    php83-pdo_pgsql \
-    php83-pdo_sqlite \
-    php83-pear \
-    php83-pecl-apcu \
-    php83-pecl-mcrypt \
-    php83-pecl-memcached \
-    php83-pecl-redis \
-    php83-pgsql \
-    php83-phar \
-    php83-posix \
-    php83-soap \
-    php83-sockets \
-    php83-sodium \
-    php83-sqlite3 \
-    php83-tokenizer \
-    php83-xmlreader \
-    php83-xsl
+    php85-bcmath \
+    php85-bz2 \
+    php85-dom \
+    php85-exif \
+    php85-ftp \
+    php85-fpm \
+    php85-gd \
+    php85-gmp \
+    php85-imap \
+    php85-intl \
+    php85-ldap \
+    php85-mysqli \
+    php85-mysqlnd \
+    php85-pdo_mysql \
+    php85-pdo_odbc \
+    php85-pdo_pgsql \
+    php85-pdo_sqlite \
+    php85-pear \
+    php85-pecl-apcu \
+    php85-pecl-memcached \
+    php85-pecl-redis \
+    php85-pgsql \
+    php85-phar \
+    php85-posix \
+    php85-soap \
+    php85-sockets \
+    php85-sodium \
+    php85-sqlite3 \
+    php85-tokenizer \
+    php85-xmlreader \
+    php85-xsl
 
 RUN \
   echo "**** configure nginx ****" \
@@ -73,14 +78,14 @@ RUN \
   && adduser -u 82 -D -S -G www-data www-data \
   && mkdir -p /data/web \
   && echo "**** guarantee correct php version is symlinked ****"  \
-  && if [ "$(readlink /usr/bin/php)" != "php83" ]; then \
+  && if [ "$(readlink /usr/bin/php)" != "php85" ]; then \
     rm -rf /usr/bin/php  && \
-    ln -s /usr/bin/php83 /usr/bin/php; \
+    ln -s /usr/bin/php85 /usr/bin/php; \
   fi 
 
 RUN \
   echo "**** add run paths to php runtime config ****" \
-  && grep -qxF 'include=/config/php/*.conf' /etc/php83/php-fpm.conf || echo 'include=/config/php/*.conf' >> /etc/php83/php-fpm.conf  \
+  && grep -qxF 'include=/config/php/*.conf' /etc/php85/php-fpm.conf || echo 'include=/config/php/*.conf' >> /etc/php85/php-fpm.conf  \
   && echo "**** install php composer ****" && \
   EXPECTED_CHECKSUM="$(php -r 'copy("https://composer.github.io/installer.sig", "php://stdout");')" && \
   php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
